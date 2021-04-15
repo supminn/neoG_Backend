@@ -7,11 +7,15 @@ const cors = require("cors");
 app.use(cors());
 app.use(bodyParser.json());
 
-const categoryRouter = require("./routers/category");
-const userAuth = require("./routers/userAuthentication");
+const categoryRouter = require("./routers/category.router");
+const userAuthRouter = require("./routers/userAuth.router");
+const videoRouter = require("./routers/videos.router");
+const productRouter = require("./routers/products.router");
 
 app.use("/category", categoryRouter);
-app.use("/", userAuth);
+app.use("/", userAuthRouter);
+app.use("/videos", videoRouter);
+app.use("/products",productRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello world");
