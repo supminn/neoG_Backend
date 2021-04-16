@@ -1,19 +1,23 @@
 const userCredentials = [
     {
       username: "amar",
-      password: "musician"
+      password: "musician",
+      email:"amarkhanna@gmail.com"
     },
     {
       username: "akbar",
-      password: "tailor"
+      password: "tailor",
+      email:"akbarillahabadi@gmail.com"
     },
     {
       username: "anthony",
-      password: "father"
+      password: "father",
+      email:"anthonygonsalves@gmail.com"
     },
     {
       username: "admin",
-      password: "home"
+      password: "home",
+      email:"supmartadmin@gmail.com"
     }
   ];
 
