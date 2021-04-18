@@ -10,7 +10,10 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const databaseConnection = require("./database/dbConnect");
-databaseConnection();
+
+(async () => {
+  await databaseConnection();
+})();
 
 const categoryRouter = require("./routers/category.router");
 const userAuthRouter = require("./routers/userAuth.router");
