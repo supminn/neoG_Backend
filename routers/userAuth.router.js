@@ -23,7 +23,9 @@ router.route("/login")
 })
 
 router.route("/signup")
-
+.get((req, res)=>{
+  res.json(userCredentials);
+}) //remove this
 .post((req, res)=>{
   const {username, password, email} = req.body;
   const userExist = userCredentials.some(({username:name, email:mail})=>{

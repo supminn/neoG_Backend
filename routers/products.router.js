@@ -1,31 +1,80 @@
 const express = require("express");
 const router = express.Router();
-const products = require("../data/products");
+const { extend } = require("lodash");
+const Product = require("../models/product.model");
 
 router
   .route("/")
-  .get((req, res) => {
-    res.json(products);
+  .get(async (req, res) => {
+    try {
+      const products = await Product.find({});
+      res.json({ success: true, products });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Unable to get the list of products",
+        errMessage: err.message,
+      });
+    }
   })
-  .post((req, res) =>
-    res.send({ success: false, message: "POST functionality not implemented" })
-  );
+
+  .post(async (req, res) => {
+    try {
+      const product = req.body;
+      const newProduct = new Product(product);
+      const savedProduct = await newProduct.save();
+      res.status(201).json({ success: true, product: savedProduct });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Unable to add product",
+        errMessage: err.message,
+      });
+    }
+  });
+
+router.param("productId", async (req, res, next, proId) => {
+  try {
+    const product = await Product.findById(proId);
+    if (!product) {
+      throw Error("Unable to fetch the product");
+    }
+    req.product = product;
+    next();
+  } catch (err) {
+    res
+      .status(400)
+      .json({ success: false, message: "Unable to retrive the product" });
+  }
+});
 
 router
-  .route("/:id")
-  .get((req, res) => {
-    const { id } = req.params;
-    const data = products.find((item) => item.id === id);
-    res.json(data);
+  .route("/:productId")
+  .get(async (req, res) => {
+    const { product } = req;
+    product.__v = undefined;
+    res.json({ success: true, product });
   })
-  .post((req, res) =>
-    res.send({ success: false, message: "POST functionality not implemented" })
-  )
-  .delete((req, res) =>
-    res.send({
+
+  .post(async (req, res) => {
+    let { product } = req;
+    const productUpdates = req.body;
+    product = extend(product, productUpdates);
+    product = await product.save();
+    res.json({ success: true, product });
+  })
+
+  .delete((req, res) => {
+    res.json({
       success: false,
-      message: "DELETE functionality not implemented",
-    })
-  );
+      message: "DELETE functionality not yet implemented",
+    });
+    /*
+      let {product} = req;
+      await product.remove();
+      product.deleted = true;
+      res.json({success:true, result})
+    */
+  });
 
 module.exports = router;
