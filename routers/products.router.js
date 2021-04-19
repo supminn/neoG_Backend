@@ -27,7 +27,7 @@ router
     } catch (err) {
       res.status(500).json({
         success: false,
-        message: "Unable to add product",
+        message: "Unable to add new product",
         errMessage: err.message,
       });
     }

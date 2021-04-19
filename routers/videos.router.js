@@ -1,32 +1,82 @@
 const express = require("express");
+const faker = require("faker");
 const router = express.Router();
-const videos = require("../data/videos");
+const { extend } = require("lodash");
+const Video = require("../models/video.model");
 
 router
   .route("/")
-  .get((req, res) => {
-    res.json(videos);
+  .get(async (req, res) => {
+    try {
+      const videos = await Video.find({});
+      res.json({ success: true, videos });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Unable to get the list of videos",
+        errMessage: err.message,
+      });
+    }
   })
-  .post((req, res) =>
-    res.send({ success: false, message: "POST functionality not implemented" })
-  );
+
+  .post(async (req, res) => {
+    try {
+      const video = req.body;
+      video.date = faker.date.past();
+      const newVideo = new Video(video);
+      const savedVideo = await newVideo.save();
+      res.status(201).json({ success: true, video: savedVideo });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Unable to add new video",
+        errMessage: err.message,
+      });
+    }
+  });
+
+router.param("videoId", async (req, res, next, vId) => {
+  try {
+    const video = await Video.findById(vId);
+    if (!video) {
+      throw Error("Unable to fetch the video");
+    }
+    req.video = video;
+    next();
+  } catch (err) {
+    res
+      .status(400)
+      .json({ success: false, message: "Unable to retrive the video" });
+  }
+});
 
 router
   .route("/:videoId")
-  .get((req, res) => {
-    const { videoId } = req.params;
-    const data = videos.find((item) => item.id === videoId);
-    res.json(data);
+  .get(async (req, res) => {
+    const { video } = req;
+    video.__v = undefined;
+    res.json({ success: true, video });
   })
-  .post((req, res) =>
-    res.send({ success: false, message: "POST functionality not implemented" })
-  )
-  .delete((req, res) =>
-    res.send({
+
+  .post(async (req, res) => {
+    let { video } = req;
+    const videoUpdates = req.body;
+    video = extend(video, videoUpdates);
+    video = await video.save();
+    res.json({ success: true, video });
+  })
+
+  .delete((req, res) => {
+    res.json({
       success: false,
-      message: "DELETE functionality not implemented",
-    })
-  );
+      message: "DELETE functionality not yet implemented",
+    });
+    /*
+      let {video} = req;
+      await video.remove();
+      video.deleted = true;
+      res.json({success:true, result})
+    */
+  });
 
 module.exports = router;
-/* Implementation yet to be done completely */

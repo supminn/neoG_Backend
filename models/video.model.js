@@ -1,25 +1,32 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema({
-  name:{
+const videoSchema = new mongoose.Schema(
+  {
+    vid: {
       type: String,
-      required: "Name of the product is a required attribute",
+      required: "Video ID is a required attribute",
+      unique: true,
+    },
+    title: {
+      type: String,
+      required: "Name of the video is a required attribute",
+    },
+    author: String,
+    subscribers: Number,
+    image: String,
+    views: Number,
+    date: Date,
+    description: {
+      type: String,
+      minLength: [100, "Description should be atleast of 100 characters"],
+      maxLength: [800, "Description should be atmost of 800 characters"],
+    },
   },
-  image: String,
-  price: {
-      type: Number,
-      required: "Price value of the product is required"
-  },
-  brand: String,
-  category: String,
-  inStock: Boolean,
-  fastDelivery: Boolean,
-  rating: Number,
-  offer: String
-},{
-    timestamps: true
-})
+  {
+    timestamps: true,
+  }
+);
 
-const Product = mongoose.model("Product", productSchema);
+const Video = mongoose.model("Video", videoSchema);
 
-module.exports = Product;
+module.exports = Video;
