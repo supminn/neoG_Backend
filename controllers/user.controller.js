@@ -57,7 +57,8 @@ const addUser = async (req, res) => {
     }
     let newUser = new User(userData);
     newUser = await newUser.save();
-    res.status(201).json({ success: true, userId: newUser._id });
+    const user = {_id: newUser._id, name: newUser.name};
+    res.status(201).json({ success: true, user });
   } catch (err) {
     res.status(500).json({
       success: false,
