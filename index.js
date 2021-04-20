@@ -16,15 +16,15 @@ const databaseConnection = require("./database/dbConnect");
 })();
 
 const categoryRouter = require("./routers/category.router");
-const userAuthRouter = require("./routers/userAuth.router");
 const videoRouter = require("./routers/videos.router");
 const productRouter = require("./routers/products.router");
+const userRouter = require("./routers/users.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
 
 
 app.use("/category", categoryRouter);
-app.use("/", userAuthRouter);
+app.use("/users",userRouter);
 app.use("/videos", videoRouter);
 app.use("/products",productRouter);
 
