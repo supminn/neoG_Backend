@@ -16,9 +16,11 @@ const databaseConnection = require("./database/dbConnect");
 })();
 
 const categoryRouter = require("./routers/category.router");
-const videoRouter = require("./routers/videos.router");
-const productRouter = require("./routers/products.router");
-const userRouter = require("./routers/users.router");
+const videoRouter = require("./routers/video.router");
+const userRouter = require("./routers/user.router");
+const productRouter = require("./routers/product.router");
+const cartRouter = require("./routers/cart.router");
+const wishlistRouter = require("./routers/wishlist.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
 
@@ -27,6 +29,8 @@ app.use("/category", categoryRouter);
 app.use("/users",userRouter);
 app.use("/videos", videoRouter);
 app.use("/products",productRouter);
+app.use("/cart",cartRouter);
+app.use("/wishlist",wishlistRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to api-supminn");
