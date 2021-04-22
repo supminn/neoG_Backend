@@ -1,3 +1,4 @@
+const User = require("../models/user.model");
 const Wishlist = require("../models/wishlist.model");
 
 const getWishlists = async (req, res) => {
@@ -7,6 +8,16 @@ const getWishlists = async (req, res) => {
 
 const findUserWishlist = async (req, res, next, userId) => {
   try {
+    let user = await User.findOne({ _id: userId });
+    if (!user) {
+      res
+        .status(404)
+        .json({
+          success: false,
+          message: "Invalid user! Kindly register to continue",
+        });
+      throw Error("Invalid User");
+    }
     let wishlist = await Wishlist.findOne({ userId });
 
     if (!wishlist) {
