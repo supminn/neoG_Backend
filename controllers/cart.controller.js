@@ -65,7 +65,7 @@ const getUserCart = async (req, res) => {
 };
 
 const updateCart = async (req, res) => {
-  const { _id, quantity } = req.body;
+  const { _id, action } = req.body;
   const { cart } = req;
   let resStatus;
   const productExists = cart.products.some((product) => product._id == _id);
@@ -73,14 +73,20 @@ const updateCart = async (req, res) => {
     resStatus = 200;
     for (let product of cart.products) {
       if (product._id == _id) {
-        product.quantity = quantity;
-        quantity > 0 ? (product.active = true) : (product.active = false);
+        console.log(product);
+        if(action.toUpperCase() === "ADD"){
+          product.quantity = product.quantity+1;
+        }
+        if(action.toUpperCase() === "REMOVE"){
+          product.quantity = product.quantity-1;
+        }
+        product.quantity > 0 ? (product.active = true) : (product.active = false);
         break;
       }
     }
   } else {
     resStatus = 201;
-    cart.products.push({ _id, quantity, active: true });
+    cart.products.push({ _id, quantity:1, active: true });
   }
 
   let updatedCart = await cart.save();
