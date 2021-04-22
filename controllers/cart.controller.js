@@ -73,12 +73,12 @@ const updateCart = async (req, res) => {
     resStatus = 200;
     for (let product of cart.products) {
       if (product._id == _id) {
-        console.log(product);
-        if(action.toUpperCase() === "ADD"){
-          product.quantity = product.quantity+1;
-        }
-        if(action.toUpperCase() === "REMOVE"){
-          product.quantity = product.quantity-1;
+        switch(action.toUpperCase()){
+          case "ADD":product.quantity = product.quantity+1;
+          break;
+          case  "REMOVE": product.quantity = product.quantity-1;
+          break;
+          case "MOVE": product.quantity = 0;
         }
         product.quantity > 0 ? (product.active = true) : (product.active = false);
         break;
