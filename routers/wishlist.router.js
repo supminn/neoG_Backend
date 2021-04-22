@@ -3,7 +3,7 @@ const router = express.Router();
 const {getWishlists, findUserWishlist, getUserWishlist, updateWishlist} = require("../controllers/wishlist.controller");
 
 router.route("/")
-.get(getWishlists); //not required
+.get(getWishlists); 
 
 router.param("userId", findUserWishlist);
 
