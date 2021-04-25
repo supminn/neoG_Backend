@@ -11,6 +11,6 @@ router.param("userId", findUserAddress);
 router.route("/:userId")
 .get(getUserAddress)
 .post(updateUserAddress)
-.delete(removeUserAddress);
+.put(removeUserAddress);
 
 module.exports = router;
