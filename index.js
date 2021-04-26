@@ -32,7 +32,7 @@ app.use("/wishlist", wishlistRouter);
 app.use("/address", addressRouter);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to api-supminn");
+  res.send("Welcome to api-supmin");
 });
 
 app.use(routeHandler);
