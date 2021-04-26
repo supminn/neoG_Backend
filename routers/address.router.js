@@ -1,5 +1,4 @@
 const express = require("express");
-const { route } = require("./category.router");
 const router = express.Router();
 const {getAddresses, findUserAddress, getUserAddress, updateUserAddress, removeUserAddress} = require("../controllers/address.controller");
 
