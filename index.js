@@ -15,7 +15,6 @@ const databaseConnection = require("./database/dbConnect");
   await databaseConnection();
 })();
 
-const categoryRouter = require("./routers/category.router");
 const videoRouter = require("./routers/video.router");
 const userRouter = require("./routers/user.router");
 const productRouter = require("./routers/product.router");
@@ -25,7 +24,6 @@ const addressRouter = require("./routers/address.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
 
-app.use("/category", categoryRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
 app.use("/products", productRouter);
