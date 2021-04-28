@@ -110,5 +110,5 @@ module.exports = {
   findUserCart,
   getUserCart,
   updateCart,
-  clearCart,
+  clearCart
 };

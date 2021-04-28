@@ -15,21 +15,25 @@ const databaseConnection = require("./database/dbConnect");
   await databaseConnection();
 })();
 
-const videoRouter = require("./routers/video.router");
 const userRouter = require("./routers/user.router");
 const productRouter = require("./routers/product.router");
 const cartRouter = require("./routers/cart.router");
 const wishlistRouter = require("./routers/wishlist.router");
 const addressRouter = require("./routers/address.router");
+const videoRouter = require("./routers/video.router");
+const likedVideoRouter = require("./routers/likedVideo.router");
+const historyRouter = require("./routers/history.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
 
 app.use("/users", userRouter);
-app.use("/videos", videoRouter);
 app.use("/products", productRouter);
 app.use("/cart", cartRouter);
 app.use("/wishlist", wishlistRouter);
 app.use("/address", addressRouter);
+app.use("/videos", videoRouter);
+app.use("/liked-video", likedVideoRouter);
+app.use("/history", historyRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to api-supmin");
