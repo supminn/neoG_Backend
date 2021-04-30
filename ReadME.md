@@ -11,3 +11,4 @@ Backend using ExpressJS connected to MongoDB through Mongoose
 * Update cart logic using quantity
 * User playlist and liked videos list
 * Create route for cartId so that the other person can view what is to be order (irrespective of user login)
+* Refactor Playlist controller logic - populate video data.

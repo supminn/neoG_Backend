@@ -23,6 +23,7 @@ const addressRouter = require("./routers/address.router");
 const videoRouter = require("./routers/video.router");
 const likedVideoRouter = require("./routers/likedVideo.router");
 const historyRouter = require("./routers/history.router");
+const playlistRouter = require("./routers/playlist.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
 
@@ -34,9 +35,10 @@ app.use("/address", addressRouter);
 app.use("/videos", videoRouter);
 app.use("/liked-video", likedVideoRouter);
 app.use("/history", historyRouter);
+app.use("/playlist", playlistRouter);
 
 app.get("/", (req, res) => {
-  res.send("Welcome to api-supmin");
+  res.send("Welcome to api-supminn");
 });
 
 app.use(routeHandler);
