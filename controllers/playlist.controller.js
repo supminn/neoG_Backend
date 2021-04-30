@@ -66,14 +66,14 @@ const getUserPlaylist = async (req, res) => {
 const createPlaylist = async (req, res) => {
   const { name, _id } = req.body;
   let { playlist } = req;
-  const newList = {
+  let newList = {
     name,
     videos: [{ _id, active: true }],
     active: true,
   };
   playlist.playlists = concat(playlist.playlists,newList );
   let updatedPlaylist = await playlist.save();
-  updatedPlaylist = await getActivePlaylistItems(updatedPlaylist);
+  newList = updatedPlaylist.playlists[updatedPlaylist.playlists.length-1];
   res.status(201).json({ success: true, playlist: newList });
 };
 
