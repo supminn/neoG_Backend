@@ -28,6 +28,6 @@ listRouter
   .route("/:playlistId")
   .get(getPlaylistVideos)
   .post(updatePlaylistVideo)
-  .delete(removePlaylist);
+  .put(removePlaylist);
 
 module.exports = router;
