@@ -1,6 +1,6 @@
 const User = require("../models/user.model");
 const History = require("../models/history.model");
-const { concat, dropWhile } = require("lodash");
+const { concat, remove } = require("lodash");
 
 const getHistory = async (req, res) => {
   const history = await History.find({});
@@ -61,7 +61,7 @@ const addToHistory = async (req, res) => {
   const videoExists = history.videos.some((video) => video._id == _id);
   if (videoExists) {
     resStatus = 200;
-    history.videos = dropWhile(history.videos, (video) => video._id == _id);
+    remove(history.videos, (video) => video._id == _id);
     history.videos = concat(history.videos, { _id, active: true });
   } else {
     resStatus = 201;
