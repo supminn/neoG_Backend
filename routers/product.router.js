@@ -12,18 +12,6 @@ router.param("productId", findProduct);
 router
   .route("/:productId")
   .get(getProductById)
-  .post(modifyProduct)
-  .delete((req, res) => {
-    res.json({
-      success: false,
-      message: "DELETE functionality not yet implemented",
-    });
-    /*
-      let {product} = req;
-      await product.remove();
-      product.deleted = true;
-      res.json({success:true, result})
-    */
-  });
+  .post(modifyProduct);
 
 module.exports = router;

@@ -11,9 +11,7 @@ app.use(bodyParser.json());
 
 const databaseConnection = require("./database/dbConnect");
 
-(async () => {
-  await databaseConnection();
-})();
+ databaseConnection();
 
 const userRouter = require("./routers/user.router");
 const productRouter = require("./routers/product.router");

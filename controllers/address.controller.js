@@ -9,7 +9,7 @@ const getAddresses = async (req, res) => {
 
 const findUserAddress = async (req, res, next, userId) => {
   try {
-    let user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       res.status(404).json({
         success: false,

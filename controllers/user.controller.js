@@ -23,7 +23,6 @@ const findUser = async (req, res) => {
   const usernameExsists = await User.exists({ username });
   if (usernameExsists) {
     let user = await User.findOne({ username, password });
-    console.log(user);
     if (user) {
       res.json({ success: true, user: { _id: user._id, name: user.name } });
     } else {
