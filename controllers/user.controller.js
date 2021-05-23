@@ -21,7 +21,6 @@ const getUsers = async (req, res) => {
 
 const findUser = async (req, res) => {
   const { username, password } = req.body;
-  //verify brcypted password and check
   const usernameExsists = await User.exists({ username });
   if (usernameExsists) {
     let user = await User.findOne({ username });
