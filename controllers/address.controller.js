@@ -21,7 +21,7 @@ const findUserAddress = async (req, res, next, userId) => {
 
     if (!address) {
       address = new Address({ userId, addresses: [] });
-      address - (await address.save());
+      address = (await address.save());
     }
     req.address = address;
     next();

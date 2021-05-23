@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const { extend } = require("lodash");
+const bcrypt = require("bcrypt");
 
 const getUsers = async (req, res) => {
   try {
@@ -20,16 +21,19 @@ const getUsers = async (req, res) => {
 
 const findUser = async (req, res) => {
   const { username, password } = req.body;
+  //verify brcypted password and check
   const usernameExsists = await User.exists({ username });
   if (usernameExsists) {
-    let user = await User.findOne({ username, password });
+    let user = await User.findOne({ username });
     if (user) {
-      res.json({ success: true, user: { _id: user._id, name: user.name } });
-    } else {
-      res.status(401).json({
-        success: false,
-        message: "Username and password does not match",
-      });
+      if (bcrypt.compareSync(password, user.password)) {
+        res.json({ success: true, user: { _id: user._id, name: user.name } });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: "Username and password does not match",
+        });
+      }
     }
   } else {
     res.status(401).json({
@@ -41,7 +45,7 @@ const findUser = async (req, res) => {
 
 const addUser = async (req, res) => {
   try {
-    const userData = req.body;
+    let userData = req.body;
     const usernameExsists = await User.exists({ username: userData.username });
     const emailExsists = await User.exists({ email: userData.email });
     if (usernameExsists) {
@@ -54,9 +58,10 @@ const addUser = async (req, res) => {
         .json({ success: false, message: "Email is already registered." });
       return emailExsists;
     }
+    userData.password = bcrypt.hashSync(userData.password, 10);
     let newUser = new User(userData);
     newUser = await newUser.save();
-    const user = {_id: newUser._id, name: newUser.name};
+    const user = { _id: newUser._id, name: newUser.name };
     res.status(201).json({ success: true, user });
   } catch (err) {
     res.status(500).json({
