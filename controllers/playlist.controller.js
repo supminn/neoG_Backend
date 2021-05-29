@@ -1,27 +1,14 @@
-const User = require("../models/user.model");
 const Playlist = require("../models/playlist.model");
 const { concat } = require("lodash");
 
-const getPlaylists = async (req, res) => {
-  const playlist = await Playlist.find({});
-  res.json({ success: true, playlist });
-};
-
-const findUserPlaylist = async (req, res, next, userId) => {
+const findUserPlaylist = async (req, res, next) => {
   try {
-    let user = await User.findOne({ _id: userId });
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: "Invalid user! Kindly register to continue",
-      });
-      throw Error("Invalid User");
-    }
-    let playlist = await Playlist.findOne({ userId });
+    const { user } = req;
+    let playlist = await Playlist.findOne({ userId: user._id });
 
     if (!playlist) {
       playlist = new Playlist({
-        userId,
+        userId: user._id,
         playlists: [{ name: "Watch Later", videos: [], active: true }],
       });
       playlist = await playlist.save();
@@ -41,9 +28,9 @@ const getActivePlaylistItems = async (playlist) => {
   playlist.playlists = playlist.playlists = playlist.playlists.filter(
     (list) => list.active
   );
-  for(let list of playlist.playlists){
-    if(list.videos.length>0){
-      list.videos = list.videos.filter(video => video.active);
+  for (let list of playlist.playlists) {
+    if (list.videos.length > 0) {
+      list.videos = list.videos.filter((video) => video.active);
     }
   }
   return playlist.playlists;
@@ -71,18 +58,80 @@ const createPlaylist = async (req, res) => {
     videos: [{ _id, active: true }],
     active: true,
   };
-  playlist.playlists = concat(playlist.playlists,newList );
+  playlist.playlists = concat(playlist.playlists, newList);
   let updatedPlaylist = await playlist.save();
-  newList = updatedPlaylist.playlists[updatedPlaylist.playlists.length-1];
+  newList = updatedPlaylist.playlists[updatedPlaylist.playlists.length - 1];
   res.status(201).json({ success: true, playlist: newList });
 };
 
+const findPlaylistById = (req, res, next, listId) => {
+  const { playlist } = req;
+  let list = playlist.playlists.find((list) => list._id == listId);
+  if (!list) {
+    return res.status(500).json({
+      success: false,
+      message: "Unable to retrive specific playlist",
+    });
+  }
+  req.list = list;
+  next();
+};
+
+
+const getActiveVideos = (videoList) => {
+  videoList = videoList.filter((item) => item.active);
+  return videoList.map((item) => item._id);
+};
+
+const getPlaylistVideos = (req, res) => {
+  const {list} = req;
+  playlistVideos = getActiveVideos(list.videos);
+  res.json({ success: true, playlist: playlistVideos });
+};
+
+const getVideosInPlaylist =  (playlist, listId) => {
+  let playlistItem = playlist.playlists.find((item) => item._id == listId && item.active);
+  if (!playlistItem) {
+    throw Error("Playlist item not found. It may either be deleted or not created");
+  }
+  return playlistItem.videos;
+}
+
+const updatePlaylistVideo = async (req, res) => {
+  const {list, playlist} = req;
+  const { _id } = req.body;
+  let playlistVideos = list.videos.map(item => item._id);
+  const videoExists = playlistVideos.some((item) => item == _id);
+
+  for (let listItem of playlist.playlists) {
+    if (listItem._id == list._id) {
+      if (videoExists) {
+        for (let video of list.videos) {
+          if (video._id == _id) {
+            video.active = !video.active;
+            break;
+          }
+        }
+      } else {
+        listItem.videos.push({ _id, active: true });
+        break;
+      }
+    }
+  }
+
+  let updatedPlaylist = await playlist.save();
+  playlistVideos = getVideosInPlaylist(updatedPlaylist, list._id);
+  playlistVideos = getActiveVideos(playlistVideos);
+  res.json({ success: true, playlist: playlistVideos });
+};
+
+
 const updatePlaylistName = async (req, res) => {
-  const { _id, name } = req.body;
-  let { playlist } = req;
-  for (let list of playlist.playlists) {
-    if (list._id == _id) {
-      list.name = name;
+  const { name } = req.body;
+  let { playlist, list } = req;
+  for (let listItem of playlist.playlists) {
+    if (listItem._id == list._id) {
+      listItem.name = name;
       break;
     }
   }
@@ -91,62 +140,13 @@ const updatePlaylistName = async (req, res) => {
   res.json({ success: true, playlist: updatedPlaylist });
 };
 
-const getVideosInPlaylist =  (playlist, listId) => {
-    let playlistItem = playlist.playlists.find((item) => item._id == listId && item.active);
-    if (!playlistItem) {
-      throw Error("Playlist item not found. It may either be deleted or not created");
-    }
-    return playlistItem.videos;
-};
 
-const getActiveVideos = videoList => {
-  videoList = videoList.filter(item => item.active);
-  return videoList.map(item => item._id);
-}
-
-const getPlaylistVideos =  async (req, res) => {
-  const {playlistId} = req.params;
-  const {playlist} = req;
-  let playlistVideos = getVideosInPlaylist(playlist, playlistId);
- playlistVideos = getActiveVideos(playlistVideos);
-  res.json({ success: true , playlist: playlistVideos});
-};
-
-const updatePlaylistVideo = async (req, res) => {
-  let {playlist} = req; 
-  const {playlistId} = req.params;
-  const {_id}  = req.body;
-  let playlistVideos = getVideosInPlaylist(playlist, playlistId);
-  playlistVideos = playlistVideos.map(item => item._id);
-  const videoExists = playlistVideos.some(item => item == _id);
-    for(let list of playlist.playlists){
-      if(list._id == playlistId){
-        if(videoExists){
-          for(let video of list.videos){
-            if(video._id == _id){
-              video.active = !video.active;
-              break;
-            }
-          }
-        }
-        else{
-          list.videos.push({_id, active: true});
-          break;
-        }
-      }
-    }
-  let updatedPlaylist = await playlist.save();
-  playlistVideos = getVideosInPlaylist(updatedPlaylist, playlistId);
-  playlistVideos = getActiveVideos(playlistVideos);
-  res.json({ success: true, playlist: playlistVideos });
-};
-
-const removePlaylist = async (req, res) => {
-  let {playlist} = req;
-  const {playlistId} = req.params;
-  for(let list of playlist.playlists){
-    if(list._id == playlistId){
-      list.active = false;
+const deletePlaylist = async (req, res) => {
+  let { playlist, list } = req;
+  
+  for (let listItem of playlist.playlists) {
+    if (listItem._id == list._id) {
+      listItem.active = false;
       break;
     }
   }
@@ -157,12 +157,12 @@ const removePlaylist = async (req, res) => {
 };
 
 module.exports = {
-  getPlaylists,
   findUserPlaylist,
+  findPlaylistById,
   getUserPlaylist,
   createPlaylist,
   updatePlaylistName,
-  removePlaylist,
+  deletePlaylist,
   getPlaylistVideos,
   updatePlaylistVideo,
 };

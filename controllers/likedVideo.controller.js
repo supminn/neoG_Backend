@@ -1,27 +1,12 @@
-const User = require("../models/user.model");
 const LikedVideo = require("../models/likedVideo.model");
 
-const getLikedVideos = async (req, res) => {
-  const likedVideos = await LikedVideo.find({});
-  res.json({ success: true, likedVideos });
-};
-
-const findUserLikedVideo = async (req, res, next, userId) => {
+const findUserLikedVideo = async (req, res, next) => {
   try {
-    let user = await User.findOne({ _id: userId });
-    if (!user) {
-      res
-        .status(404)
-        .json({
-          success: false,
-          message: "Invalid user! Kindly register to continue",
-        });
-      throw Error("Invalid User");
-    }
-    let likedVideo = await LikedVideo.findOne({ userId });
+    const {user} = req;
+    let likedVideo = await LikedVideo.findOne({ userId: user._id });
 
     if (!likedVideo) {
-      likedVideo = new LikedVideo({ userId, videos: [] });
+      likedVideo = new LikedVideo({ userId: user._id, videos: [] });
       likedVideo = await likedVideo.save();
     }
     req.likedVideo = likedVideo;
@@ -79,7 +64,6 @@ const updateLikedVideo = async (req, res) => {
 };
 
 module.exports = {
-  getLikedVideos,
   findUserLikedVideo,
   getUserLikedVideo,
   updateLikedVideo,

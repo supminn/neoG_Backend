@@ -1,33 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const listRouter = express.Router({ mergeParams: true });
+
 const {
-  getPlaylists,
   findUserPlaylist,
+  findPlaylistById,
   getUserPlaylist,
   createPlaylist,
   updatePlaylistName,
   getPlaylistVideos,
-  removePlaylist,
+  deletePlaylist,
   updatePlaylistVideo,
 } = require("../controllers/playlist.controller");
 
-router.use("/:userId/list", listRouter);
 
-router.route("/").get(getPlaylists);
-
-router.param("userId", findUserPlaylist);
+router.use(findUserPlaylist);
 
 router
-  .route("/:userId")
+  .route("/")
   .get(getUserPlaylist)
-  .post(createPlaylist)
-  .put(updatePlaylistName);
+  .post(createPlaylist);
 
-listRouter
+  
+router.param("playlistId", findPlaylistById);
+router
   .route("/:playlistId")
   .get(getPlaylistVideos)
   .post(updatePlaylistVideo)
-  .put(removePlaylist);
+  .put(updatePlaylistName)
+  .delete(deletePlaylist);
 
 module.exports = router;

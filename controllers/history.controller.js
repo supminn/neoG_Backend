@@ -1,26 +1,14 @@
-const User = require("../models/user.model");
 const History = require("../models/history.model");
 const { concat, remove } = require("lodash");
 
-const getHistory = async (req, res) => {
-  const history = await History.find({});
-  res.json({ success: true, history });
-};
 
-const findUserHistory = async (req, res, next, userId) => {
+const findUserHistory = async (req, res, next) => {
   try {
-    let user = await User.findOne({ _id: userId });
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: "Invalid user! Kindly register to continue",
-      });
-      throw Error("Invalid User");
-    }
-    let history = await History.findOne({ userId });
+    const {user} = req;
+    let history = await History.findOne({ userId: user._id });
 
     if (!history) {
-      history = new History({ userId, videos: [] });
+      history = new History({ userId: user._id, videos: [] });
       history = await history.save();
     }
     req.history = history;
@@ -98,7 +86,6 @@ const clearHistory = async (req, res) => {
 };
 
 module.exports = {
-  getHistory,
   findUserHistory,
   getUserHistory,
   addToHistory,

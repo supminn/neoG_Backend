@@ -55,6 +55,9 @@ const getVideoById = async (req, res) => {
 const updateVideo = async (req, res) => {
   let { video } = req;
   const videoUpdates = req.body;
+  if(videoUpdates._id){
+    return res.status(400).json({success: false, message:"Forbidden request. Video id cannot be updated."})
+  }
   video = extend(video, videoUpdates);
   video = await video.save();
   res.json({ success: true, video });

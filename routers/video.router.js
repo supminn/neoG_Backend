@@ -12,18 +12,6 @@ router.param("videoId",findVideo);
 router
   .route("/:videoId")
   .get(getVideoById)
-  .post(updateVideo)
-  .delete((req, res) => {
-    res.json({
-      success: false,
-      message: "DELETE functionality not yet implemented",
-    });
-    /*
-      let {video} = req;
-      await video.remove();
-      video.deleted = true;
-      res.json({success:true, result})
-    */
-  });
+  .post(updateVideo);
 
 module.exports = router;

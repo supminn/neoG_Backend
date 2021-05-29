@@ -32,13 +32,12 @@ app.get("/", (req, res) => {
 app.use("/users", userRouter);
 app.use("/products", productRouter);
 app.use("/videos", videoRouter);
-app.use(authenticate);
-app.use("/wishlist", wishlistRouter);
-app.use("/cart", cartRouter);
-app.use("/address", addressRouter);
-app.use("/history", historyRouter);
-app.use("/liked-video", likedVideoRouter);
-app.use("/playlist", playlistRouter);
+app.use("/wishlist",authenticate, wishlistRouter);
+app.use("/cart",authenticate, cartRouter);
+app.use("/address",authenticate, addressRouter);
+app.use("/history",authenticate, historyRouter);
+app.use("/liked-video",authenticate, likedVideoRouter);
+app.use("/playlist",authenticate, playlistRouter);
 
 app.use(routeHandler);
 app.use(errorHandler);

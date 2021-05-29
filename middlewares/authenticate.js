@@ -2,10 +2,12 @@ const User = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 
 const authenticate = async (req, res, next) => {
-    const token = req.headers.authorization.split(" ")[1];
+   try{
+    let token = req.headers.authorization;
     if(!token){
         return res.status(401).json({success:false, errorMessage:"Unauthorized. Token not passed."});
     }
+    token = token.split(" ")[1];
     const decodedValue = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({_id: decodedValue._id});
     if(!user){
@@ -15,6 +17,10 @@ const authenticate = async (req, res, next) => {
     user.password = undefined;
     req.user = user;
     next();
+   }
+   catch (error){
+       res.status(401).json({success:false, errMessage:error.message});
+   }
 
 }
 

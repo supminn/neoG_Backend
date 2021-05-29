@@ -1,13 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {getLikedVideos, findUserLikedVideo, getUserLikedVideo, updateLikedVideo} = require("../controllers/likedVideo.controller");
+const {findUserLikedVideo, getUserLikedVideo, updateLikedVideo} = require("../controllers/likedVideo.controller");
+ 
+router.use(findUserLikedVideo);
 
 router.route("/")
-.get(getLikedVideos); 
-
-router.param("userId", findUserLikedVideo);
-
-router.route("/:userId")
 .get(getUserLikedVideo)
 .post(updateLikedVideo);
 
