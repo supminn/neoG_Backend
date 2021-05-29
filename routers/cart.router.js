@@ -1,13 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const {getCarts, findUserCart, getUserCart, updateCart, clearCart} = require("../controllers/cart.controller");
+const {findUserCart, getUserCart, updateCart, clearCart} = require("../controllers/cart.controller");
+
+
+router.use(findUserCart);
 
 router.route("/")
-.get(getCarts);
-
-router.param("userId", findUserCart);
-
-router.route("/:userId")
 .get(getUserCart)
 .post(updateCart)
 .delete(clearCart);

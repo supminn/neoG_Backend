@@ -1,13 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const {getAddresses, findUserAddress, getUserAddress, updateUserAddress, removeUserAddress} = require("../controllers/address.controller");
+const { findUserAddress, getUserAddress, updateUserAddress, removeUserAddress} = require("../controllers/address.controller");
+
+router.use(findUserAddress);
 
 router.route("/")
-.get(getAddresses);
-
-router.param("userId", findUserAddress);
-
-router.route("/:userId")
 .get(getUserAddress)
 .post(updateUserAddress)
 .put(removeUserAddress);

@@ -53,6 +53,9 @@ const getProductById = async (req, res) => {
 const modifyProduct = async (req, res) => {
   let { product } = req;
   const productUpdates = req.body;
+  if(productUpdates._id){
+    return res.status(400).json({success: false, message:"Forbidden request. Product id cannot be updated."})
+  }
   product = extend(product, productUpdates);
   product = await product.save();
   res.json({ success: true, product });

@@ -1,27 +1,14 @@
-const User = require("../models/user.model");
-const Address = require("../models/adress.model");
-const { extend, concat, add } = require("lodash");
+const Address = require("../models/address.model");
+const { extend, concat } = require("lodash");
 
-const getAddresses = async (req, res) => {
-  const address = await Address.find({});
-  res.json({ success: true, address });
-};
-
-const findUserAddress = async (req, res, next, userId) => {
+const findUserAddress = async (req, res, next) => {
   try {
-    const user = await User.findOne({ _id: userId });
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: "Invalid user! Kindly register to continue",
-      });
-      throw Error("Invalid User");
-    }
-    let address = await Address.findOne({ userId });
+    const { user } = req;
+    let address = await Address.findOne({ userId: user._id });
 
     if (!address) {
-      address = new Address({ userId, addresses: [] });
-      address = (await address.save());
+      address = new Address({ userId: user._id, addresses: [] });
+      address = await address.save();
     }
     req.address = address;
     next();
@@ -80,8 +67,8 @@ const updateUserAddress = async (req, res) => {
   }
 
   let updatedAddress = await address.save();
-  let addressList = await getUserAddressList(address);
-  res.status(resStatus).json({ success: true, address: addressList });
+  updatedAddress = await getUserAddressList(updatedAddress);
+  res.status(resStatus).json({ success: true, address: updatedAddress });
 };
 
 const removeUserAddress = async (req, res) => {
@@ -93,13 +80,12 @@ const removeUserAddress = async (req, res) => {
       break;
     }
   }
-  let updatedAddress = await address.save();
-  let addressList = await getUserAddressList(address);
+  let addressList = await address.save();
+  addressList = await getUserAddressList(address);
   res.json({ success: true, address: addressList });
 };
 
 module.exports = {
-  getAddresses,
   findUserAddress,
   getUserAddress,
   updateUserAddress,

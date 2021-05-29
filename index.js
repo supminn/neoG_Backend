@@ -23,16 +23,23 @@ const historyRouter = require("./routers/history.router");
 const playlistRouter = require("./routers/playlist.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
+const authenticate = require("./middlewares/authenticate");
 
 app.use("/users", userRouter);
 app.use("/products", productRouter);
-app.use("/cart", cartRouter);
-app.use("/wishlist", wishlistRouter);
-app.use("/address", addressRouter);
 app.use("/videos", videoRouter);
-app.use("/liked-video", likedVideoRouter);
+app.use(authenticate);
+app.use("/wishlist", wishlistRouter);
+app.use("/cart", cartRouter);
+app.use("/address", addressRouter);
 app.use("/history", historyRouter);
+app.use("/liked-video", likedVideoRouter);
 app.use("/playlist", playlistRouter);
+
+app.get("/token", (req, res) => {
+  const {user} = req;
+  res.json({sucess:true, message:"Entered token", user});
+})
 
 app.get("/", (req, res) => {
   res.send("Welcome to api-supminn");

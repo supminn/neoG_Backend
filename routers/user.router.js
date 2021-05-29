@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {getUsers, addUser, findUser,findUserById, getUserById, updateUser} = require("../controllers/user.controller");
+const {getUsers, registerUser, findUser,findUserById, getUserById, updateUser} = require("../controllers/user.controller");
 
 router.route("/")
 .get(getUsers);
@@ -9,7 +9,7 @@ router.route("/login")
 .post(findUser)
 
 router.route("/signup")
-.post(addUser);
+.post(registerUser);
 
 router.param("userId",findUserById);
 

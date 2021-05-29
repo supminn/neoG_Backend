@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const { extend } = require("lodash");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const getUsers = async (req, res) => {
   try {
@@ -21,18 +22,16 @@ const getUsers = async (req, res) => {
 
 const findUser = async (req, res) => {
   const { username, password } = req.body;
-  const usernameExsists = await User.exists({ username });
-  if (usernameExsists) {
-    let user = await User.findOne({ username });
-    if (user) {
-      if (bcrypt.compareSync(password, user.password)) {
-        res.json({ success: true, user: { _id: user._id, name: user.name } });
-      } else {
-        res.status(401).json({
-          success: false,
-          message: "Username and password does not match",
-        });
-      }
+  let user = await User.findOne({ username });
+  if (user) {
+    if (bcrypt.compareSync(password, user.password)) {
+      const token = jwt.sign({_id: user._id, name: user.name},process.env.JWT_SECRET, { expiresIn: "24h" });
+      res.json({ success: true, token });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: "Username and password does not match",
+      });
     }
   } else {
     res.status(401).json({
@@ -42,7 +41,7 @@ const findUser = async (req, res) => {
   }
 };
 
-const addUser = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
     let userData = req.body;
     const usernameExsists = await User.exists({ username: userData.username });
@@ -60,8 +59,8 @@ const addUser = async (req, res) => {
     userData.password = bcrypt.hashSync(userData.password, 10);
     let newUser = new User(userData);
     newUser = await newUser.save();
-    const user = { _id: newUser._id, name: newUser.name };
-    res.status(201).json({ success: true, user });
+
+    res.json({ success: true, message:"Successfully added new user" });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -95,6 +94,14 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
   let { user } = req;
   const userUpdates = req.body;
+  const userWithSameUsername = await User.findOne({username: userUpdates.username});
+  if(userWithSameUsername){
+    return res.status(403).json({success: false, message:"Username updation failed. Another user exists with the same username."});
+  }
+  const userWithSameEmail = await User.findOne({email: userUpdates.email});
+  if(userWithSameEmail){
+    return res.status(403).json({success: false, message:"Email updation failed. Another user exists with the same email."});
+  }
   user = extend(user, userUpdates);
   user = await user.save();
   user.password = undefined;
@@ -103,7 +110,7 @@ const updateUser = async (req, res) => {
 
 module.exports = {
   getUsers,
-  addUser,
+  registerUser,
   findUser,
   findUserById,
   getUserById,

@@ -1,30 +1,18 @@
 const Cart = require("../models/cart.model");
-const User = require("../models/user.model");
 
-const getCarts = async (req, res) => {
-  const carts = await Cart.find({});
-  res.json({ success: true, carts });
-};
-
-const findUserCart = async (req, res, next, userId) => {
+const findUserCart = async (req, res, next) => {
   try {
-    let user = await User.findOne({ _id: userId });
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: "Invalid user! Kindly register to continue",
-      });
-      throw Error("Invalid User");
-    }
-
-    let cart = await Cart.findOne({ userId });
+    const {user} = req;
+    let cart = await Cart.findOne({ userId: user._id });
 
     if (!cart) {
-      cart = new Cart({ userId, products: [] });
+      cart = new Cart({ userId: user._id, products: [] });
       cart = await cart.save();
     }
+
     req.cart = cart;
     next();
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -106,7 +94,6 @@ const clearCart = async (req, res) => {
 };
 
 module.exports = {
-  getCarts,
   findUserCart,
   getUserCart,
   updateCart,

@@ -1,31 +1,18 @@
-const User = require("../models/user.model");
 const Wishlist = require("../models/wishlist.model");
 
-const getWishlists = async (req, res) => {
-  const wishlists = await Wishlist.find({});
-  res.json({ success: true, wishlists });
-};
-
-const findUserWishlist = async (req, res, next, userId) => {
+const findUserWishlist = async (req, res, next) => {
   try {
-    let user = await User.findOne({ _id: userId });
-    if (!user) {
-      res
-        .status(404)
-        .json({
-          success: false,
-          message: "Invalid user! Kindly register to continue",
-        });
-      throw Error("Invalid User");
-    }
-    let wishlist = await Wishlist.findOne({ userId });
+    const { user } = req;
+    let wishlist = await Wishlist.findOne({ userId: user._id });
 
     if (!wishlist) {
-      wishlist = new Wishlist({ userId, products: [] });
+      wishlist = new Wishlist({ userId: user._id, products: [] });
       wishlist = await wishlist.save();
     }
+
     req.wishlist = wishlist;
     next();
+    
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -79,7 +66,6 @@ const updateWishlist = async (req, res) => {
 };
 
 module.exports = {
-  getWishlists,
   findUserWishlist,
   getUserWishlist,
   updateWishlist,
