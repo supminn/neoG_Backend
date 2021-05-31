@@ -59,6 +59,7 @@ Backend using ExpressJS connected to MongoDB through Mongoose
 * Backend created for products, cart, wishlist, address management, user details, videos.
 
 ### Future Enchancements
+* Change password for users.
 * Update cart logic using the quantity. (remove a product irrespective of its quantity)
 * Refactor Playlist model & controller logic - populate video data.
 * Create a route using cart ID. In this way, all the products to be checked out can be shared via a link.

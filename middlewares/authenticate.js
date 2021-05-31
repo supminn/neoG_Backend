@@ -13,9 +13,7 @@ const authenticate = async (req, res, next) => {
     if(!user){
         return res.status(401).json({success:false, errorMessage:"Unauthorized. Either user is not registered or Token is invalid."});
     }
-    user.__v = undefined;
-    user.password = undefined;
-    req.user = user;
+    req.user = {_id: decodedValue._id, name: decodedValue.name};
     next();
    }
    catch (error){
