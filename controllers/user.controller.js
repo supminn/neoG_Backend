@@ -36,7 +36,7 @@ const findUser = async (req, res) => {
   } else {
     res.status(401).json({
       success: false,
-      message: "Username does not exsist",
+      message: "Username or password is incorrect",
     });
   }
 };
