@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/github/supminn/neoG_Backend.svg)](https://wakatime.com/badge/github/supminn/neoG_Backend)
+
 # neoG_backend
 Backend using ExpressJS connected to MongoDB through Mongoose
 
