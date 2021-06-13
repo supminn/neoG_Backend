@@ -20,12 +20,43 @@ const getUsers = async (req, res) => {
   }
 };
 
+const updateFollowers = async (req, res) => {
+  try {
+    const { currentUser, viewingUser } = req.body;
+    let user = await User.findOne({ _id: currentUser });
+    let viewer = await User.findOne({ _id: viewingUser });
+
+    if (user.following.includes(viewingUser)) {
+      user.following = user.following.filter((data) => data._id != viewingUser);
+      viewer.followers = user.followers.filter((data) => data._id != user);
+    } else {
+      user.following.push(viewingUser);
+      viewer.followers.push(currentUser);
+    }
+
+    user = await user.save();
+    viewer = await viewer.save();
+    res.json({ success: true, user, viewer });
+    
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to update user followers/following",
+      errMessage: err.message,
+    });
+  }
+};
+
 const findUser = async (req, res) => {
   const { username, password } = req.body;
   let user = await User.findOne({ username });
   if (user) {
     if (bcrypt.compareSync(password, user.password)) {
-      const token = jwt.sign({_id: user._id, name: user.name},process.env.JWT_SECRET, { expiresIn: "24h" });
+      const token = jwt.sign(
+        { _id: user._id, name: user.name },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
       res.json({ success: true, token });
     } else {
       res.status(401).json({
@@ -60,7 +91,7 @@ const registerUser = async (req, res) => {
     let newUser = new User(userData);
     newUser = await newUser.save();
 
-    res.json({ success: true, message:"Successfully added new user" });
+    res.json({ success: true, message: "Successfully added new user" });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -94,13 +125,23 @@ const getUserById = async (req, res) => {
 const updateUser = async (req, res) => {
   let { user } = req;
   const userUpdates = req.body;
-  const userWithSameUsername = await User.findOne({username: userUpdates.username});
-  if(userWithSameUsername){
-    return res.status(403).json({success: false, message:"Username updation failed. Another user exists with the same username."});
+  const userWithSameUsername = await User.findOne({
+    username: userUpdates.username,
+  });
+  if (userWithSameUsername) {
+    return res.status(403).json({
+      success: false,
+      message:
+        "Username updation failed. Another user exists with the same username.",
+    });
   }
-  const userWithSameEmail = await User.findOne({email: userUpdates.email});
-  if(userWithSameEmail){
-    return res.status(403).json({success: false, message:"Email updation failed. Another user exists with the same email."});
+  const userWithSameEmail = await User.findOne({ email: userUpdates.email });
+  if (userWithSameEmail) {
+    return res.status(403).json({
+      success: false,
+      message:
+        "Email updation failed. Another user exists with the same email.",
+    });
   }
   user = extend(user, userUpdates);
   user = await user.save();
@@ -110,6 +151,7 @@ const updateUser = async (req, res) => {
 
 module.exports = {
   getUsers,
+  updateFollowers,
   registerUser,
   findUser,
   findUserById,
