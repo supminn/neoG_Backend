@@ -9,11 +9,11 @@ router.route("/")
 
 router.param("postId", findPostById);
 
-router.route("/:postId/likes")
+router.route("/:postId/like")
 .get(fetchLikedUsers)
 .post(updateLikedPost)
 
-router.route("/:postId/comments")
+router.route("/:postId/comment")
 .get(fetchUserComments)
 .post(addUserComment)
 .put(deleteUserComment)

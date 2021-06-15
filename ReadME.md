@@ -65,3 +65,4 @@ Backend using ExpressJS connected to MongoDB through Mongoose
 * Update cart logic using the quantity. (remove a product irrespective of its quantity)
 * Refactor Playlist model & controller logic - populate video data.
 * Create a route using cart ID. In this way, all the products to be checked out can be shared via a link.
+* Paging on posts and comments (order by latest date first)

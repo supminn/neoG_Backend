@@ -1,23 +1,23 @@
 const express = require("express");
 const router = express.Router();
+const authenticate = require("../middlewares/authenticate");
 const {
   getUsers,
   updateFollowers,
   registerUser,
   findUser,
-  findUserById,
   getUserById,
   updateUser,
 } = require("../controllers/user.controller");
 
-router.route("/").get(getUsers).post(updateFollowers);
+router.route("/all").get(getUsers);
 
 router.route("/login").post(findUser);
 
 router.route("/signup").post(registerUser);
 
-router.param("userId", findUserById);
+router.use(authenticate);
 
-router.route("/:userId").get(getUserById).post(updateUser);
+router.route("/").get(getUserById).post(updateUser).put(updateFollowers);
 
 module.exports = router;

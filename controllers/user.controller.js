@@ -20,40 +20,13 @@ const getUsers = async (req, res) => {
   }
 };
 
-const updateFollowers = async (req, res) => {
-  try {
-    const { currentUser, viewingUser } = req.body;
-    let user = await User.findOne({ _id: currentUser });
-    let viewer = await User.findOne({ _id: viewingUser });
-
-    if (user.following.includes(viewingUser)) {
-      user.following = user.following.filter((data) => data._id != viewingUser);
-      viewer.followers = user.followers.filter((data) => data._id != user);
-    } else {
-      user.following.push(viewingUser);
-      viewer.followers.push(currentUser);
-    }
-
-    user = await user.save();
-    viewer = await viewer.save();
-    res.json({ success: true, user, viewer });
-    
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: "Unable to update user followers/following",
-      errMessage: err.message,
-    });
-  }
-};
-
 const findUser = async (req, res) => {
   const { username, password } = req.body;
   let user = await User.findOne({ username });
   if (user) {
     if (bcrypt.compareSync(password, user.password)) {
       const token = jwt.sign(
-        { _id: user._id, name: user.name },
+        { _id: user._id, name: user.name, username: user.username },
         process.env.JWT_SECRET,
         { expiresIn: "24h" }
       );
@@ -101,29 +74,16 @@ const registerUser = async (req, res) => {
   }
 };
 
-const findUserById = async (req, res, next, userId) => {
-  try {
-    const user = await User.findById(userId);
-    if (!user) {
-      throw Error("Unable to fetch the user details");
-    }
-    req.user = user;
-    next();
-  } catch (err) {
-    res
-      .status(400)
-      .json({ success: false, message: "Unable to retrive the user details" });
-  }
-};
-
 const getUserById = async (req, res) => {
-  const { user } = req;
+  let { user } = req;
+  user = await User.findOne({ _id: user._id });
   user.password = undefined;
   res.json({ success: true, user });
 };
 
 const updateUser = async (req, res) => {
   let { user } = req;
+  user = await User.findOne({_id: user._id});
   const userUpdates = req.body;
   const userWithSameUsername = await User.findOne({
     username: userUpdates.username,
@@ -149,12 +109,44 @@ const updateUser = async (req, res) => {
   res.json({ success: true, user });
 };
 
+
+const updateFollowers = async (req, res) => {
+  try {
+    let { user } = req;
+    const { viewerId } = req.body;
+    user = await User.findOne({ _id: user._id });
+    let viewer = await User.findOne({ _id: viewerId });
+
+    if (
+      user.following.includes(viewerId) ||
+      viewer.followers.includes(user._id)
+    ) {
+      user.following = user.following.filter((data) => data._id.toString() !== viewerId.toString());
+      viewer.followers = viewer.followers.filter(
+        (data) => data._id.toString() !== user._id.toString()
+      );
+    } else {
+      user.following.push(viewerId);
+      viewer.followers.push(user._id);
+    }
+
+    user = await user.save();
+    viewer = await viewer.save();
+    res.json({ success: true, user, viewer });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Unable to update user followers/following",
+      errMessage: err.message,
+    });
+  }
+};
+
 module.exports = {
   getUsers,
   updateFollowers,
   registerUser,
   findUser,
-  findUserById,
   getUserById,
   updateUser,
 };
