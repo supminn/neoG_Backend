@@ -86,6 +86,7 @@ const updateLikedPost = async (req, res) => {
       post.likes.push(user._id);
     }
     post = await post.save();
+    post.comments = post.comments.filter(comment => comment.active);
     res.json({ success: true, post });
   } catch (err) {
     res
@@ -115,6 +116,7 @@ const addUserComment = async (req, res) => {
     comment.user = user._id;
     post.comments.push(comment);
     post = await post.save();
+    post.comments = post.comments.filter(comment => comment.active);
     post = await post
       .populate({ path: "comments.user", select: "username" })
       .execPopulate();
