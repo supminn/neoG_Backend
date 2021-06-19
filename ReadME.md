@@ -1,16 +1,25 @@
 [![wakatime](https://wakatime.com/badge/github/supminn/neoG_Backend.svg)](https://wakatime.com/badge/github/supminn/neoG_Backend)
 
 # neoG_backend
-Backend using ExpressJS connected to MongoDB through Mongoose
+Backend using ExpressJS connected to MongoDB through Mongoose. Common user credentails are maintained for all the apps to obtain SSO like feature.
+[API_URL](https://api-supminn.herokuapp.com/)
+
+## Technology Stack
+- ExpressJS API
+- MongoDB with mongoose for database operations
+- JWT with token expiry for user authentication
+- bCrypt and salt for password hashing
 
 ## List of API endpoints
-[You are now signed up. Go to login]
 ### Users
+* GET /users/all - List of users available
 * POST /users/login - Takes username and password as a parameter and returns JWT.
 * POST /users/signup - Providing username, password, name, and email would add a new user into the database.
-* GET /users/user-id - Provides individual user's details.
-* POST /users/user-id - Updates user details.
+* GET /users - Provides individual user's details based on authorization header.
+* POST /users - Updates user details based on authorization header.
+* PUT /users - Updates the following list of the current user and follower list of the viewing user.
 
+## APIs used by SupMart
 ### Products
 * GET /products - List of products available.
 * POST /products - Addition of a new product into inventory.
@@ -31,6 +40,7 @@ Backend using ExpressJS connected to MongoDB through Mongoose
 * POST /address - Add new address or update existing address
 * Put /address - Remove an individual address from the given list.
 
+## APIs used by SupVision
 ### Videos
 * GET /videos - List of videos available.
 * POST /videos - Addition of a new video into the collection.
@@ -54,13 +64,31 @@ Backend using ExpressJS connected to MongoDB through Mongoose
 * POST /playlist/list-id - Add/remove videos from this playlist
 * PUT /playlist/list-id - Rename this playlist
 * DELETE /playlist/list-id - Delete this playlist
+
+### Notes for Individual Video
+* GET /note/notes/video-id - List of notes created against the specific video
+* POST /note/notes/video-id - Create a new note for this video
+* POST /note/note-id - Update the details of this note
+* PUT /note/note-id - Delete this note
+
+## APIs used by SupSocial
+### Posts for Social Media
+* GET /post - List of posts available
+* POST /post - Add a new post
+* PUT /post - Delete post with a specific id
+* GET /post/post-id/like - List of users who have liked the post
+* POST /post/post-id/like - Like or unlike this post
+* GET /post/post-id/comment - List of comments for this post
+* POST /post/post-id/comment - Add a user comment to this post
+* PUT /post/post-id/comment - Delete a comment on this post with a specific id.
+
 ## Features
 * MongoDB for database
 * Mongoose to handle validation and communicate to MongoDB
 * ExpressJS to create API routes.
 * Backend created for products, cart, wishlist, address management, user details, videos.
 
-### Future Enchancements
+### Enchancements
 * Change password for users.
 * Update cart logic using the quantity. (remove a product irrespective of its quantity)
 * Refactor Playlist model & controller logic - populate video data.
