@@ -23,6 +23,7 @@ const historyRouter = require("./routers/history.router");
 const playlistRouter = require("./routers/playlist.router");
 const noteRouter = require("./routers/note.router");
 const postRouter = require("./routers/post.router");
+const notificationRouter = require("./routers/notification.router");
 const errorHandler = require("./middlewares/errorHandler");
 const routeHandler = require("./middlewares/routeHandler");
 const authenticate = require("./middlewares/authenticate");
@@ -42,6 +43,7 @@ app.use("/liked-video", authenticate, likedVideoRouter);
 app.use("/playlist", authenticate, playlistRouter);
 app.use("/note", authenticate, noteRouter);
 app.use("/post", authenticate, postRouter);
+app.use("/notify", authenticate, notificationRouter);
 
 app.use(routeHandler);
 app.use(errorHandler);

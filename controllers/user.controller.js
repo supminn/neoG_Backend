@@ -2,6 +2,7 @@ const User = require("../models/user.model");
 const { extend } = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { postUserNotification } = require("./notification.controller");
 
 const getUsers = async (req, res) => {
   try {
@@ -83,7 +84,7 @@ const getUserById = async (req, res) => {
 
 const updateUser = async (req, res) => {
   let { user } = req;
-  user = await User.findOne({_id: user._id});
+  user = await User.findOne({ _id: user._id });
   const userUpdates = req.body;
   const userWithSameUsername = await User.findOne({
     username: userUpdates.username,
@@ -109,7 +110,6 @@ const updateUser = async (req, res) => {
   res.json({ success: true, user });
 };
 
-
 const updateFollowers = async (req, res) => {
   try {
     let { user } = req;
@@ -121,7 +121,9 @@ const updateFollowers = async (req, res) => {
       user.following.includes(viewerId) ||
       viewer.followers.includes(user._id)
     ) {
-      user.following = user.following.filter((data) => data._id.toString() !== viewerId.toString());
+      user.following = user.following.filter(
+        (data) => data._id.toString() !== viewerId.toString()
+      );
       viewer.followers = viewer.followers.filter(
         (data) => data._id.toString() !== user._id.toString()
       );
