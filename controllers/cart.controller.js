@@ -1,8 +1,9 @@
 const Cart = require("../models/cart.model");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const findUserCart = async (req, res, next) => {
   try {
-    const {user} = req;
+    const { user } = req;
     let cart = await Cart.findOne({ userId: user._id });
 
     if (!cart) {
@@ -12,7 +13,6 @@ const findUserCart = async (req, res, next) => {
 
     req.cart = cart;
     next();
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -33,7 +33,7 @@ const getCartItems = async (cart) => {
     .execPopulate();
   return cart.products.map((product) => {
     let cartItem = JSON.parse(JSON.stringify(product._id));
-    Object.assign(cartItem, {quantity: product.quantity});
+    Object.assign(cartItem, { quantity: product.quantity });
     return cartItem;
   });
 };
@@ -61,25 +61,58 @@ const updateCart = async (req, res) => {
     resStatus = 200;
     for (let product of cart.products) {
       if (product._id == _id) {
-        switch(action.toUpperCase()){
-          case "ADD":product.quantity = product.quantity+1;
-          break;
-          case  "REMOVE": product.quantity = product.quantity-1;
-          break;
-          case "MOVE": product.quantity = 0;
+        switch (action.toUpperCase()) {
+          case "ADD":
+            product.quantity = product.quantity + 1;
+            break;
+          case "REMOVE":
+            product.quantity = product.quantity - 1;
+            break;
+          case "MOVE":
+            product.quantity = 0;
         }
-        product.quantity > 0 ? (product.active = true) : (product.active = false);
+        product.quantity > 0
+          ? (product.active = true)
+          : (product.active = false);
         break;
       }
     }
   } else {
     resStatus = 201;
-    cart.products.push({ _id, quantity:1, active: true });
+    cart.products.push({ _id, quantity: 1, active: true });
   }
 
   let updatedCart = await cart.save();
   updatedCart = await getCartItems(updatedCart);
   res.status(resStatus).json({ success: true, cart: updatedCart });
+};
+
+const checkoutToPayment = async (req, res) => {
+  const { cart, user } = req;
+  let cartItems = await getCartItems(cart);
+  cartItems = cartItems.map((item) => ({
+    price_data: {
+      currency: "INR",
+      product_data: {
+        name: item.name,
+        description: item.brand,
+        images: [item.image],
+      },
+      unit_amount: item.price * 100,
+    },
+    quantity: item.quantity,
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: cartItems,
+    mode: "payment",
+    success_url: "http://localhost:3000/payment-transaction?status=success",
+    cancel_url: "http://localhost:3000/payment-transaction?status=failure",
+    customer_email: user.email,
+  });
+  res.json({ success: true, id: session.id, url: session.url });
+  // res.json({ cartItems, user, session });
 };
 
 const clearCart = async (req, res) => {
@@ -97,5 +130,6 @@ module.exports = {
   findUserCart,
   getUserCart,
   updateCart,
-  clearCart
+  checkoutToPayment,
+  clearCart,
 };
