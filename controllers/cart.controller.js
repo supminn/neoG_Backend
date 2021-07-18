@@ -89,6 +89,7 @@ const updateCart = async (req, res) => {
 
 const checkoutToPayment = async (req, res) => {
   const { cart, user } = req;
+  const { url } = req.body;
   let cartItems = await getCartItems(cart);
   cartItems = cartItems.map((item) => ({
     price_data: {
@@ -107,8 +108,8 @@ const checkoutToPayment = async (req, res) => {
     payment_method_types: ["card"],
     line_items: cartItems,
     mode: "payment",
-    success_url: "http://localhost:3000/payment-transaction?status=success",
-    cancel_url: "http://localhost:3000/payment-transaction?status=failure",
+    success_url: `${url}payment-transaction?status=success`,
+    cancel_url: `${url}payment-transaction?status=failure`,
     customer_email: user.email,
   });
   res.json({ success: true, id: session.id, url: session.url });
