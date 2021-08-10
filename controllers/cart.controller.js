@@ -113,7 +113,6 @@ const checkoutToPayment = async (req, res) => {
     customer_email: user.email,
   });
   res.json({ success: true, id: session.id, url: session.url });
-  // res.json({ cartItems, user, session });
 };
 
 const clearCart = async (req, res) => {
