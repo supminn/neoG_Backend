@@ -2,7 +2,7 @@ const Cart = require("../models/cart.model");
 
 const findUserCart = async (req, res, next) => {
   try {
-    const {user} = req;
+    const { user } = req;
     let cart = await Cart.findOne({ userId: user._id });
 
     if (!cart) {
@@ -12,7 +12,6 @@ const findUserCart = async (req, res, next) => {
 
     req.cart = cart;
     next();
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -33,7 +32,7 @@ const getCartItems = async (cart) => {
     .execPopulate();
   return cart.products.map((product) => {
     let cartItem = JSON.parse(JSON.stringify(product._id));
-    Object.assign(cartItem, {quantity: product.quantity});
+    Object.assign(cartItem, { quantity: product.quantity });
     return cartItem;
   });
 };
@@ -61,20 +60,25 @@ const updateCart = async (req, res) => {
     resStatus = 200;
     for (let product of cart.products) {
       if (product._id == _id) {
-        switch(action.toUpperCase()){
-          case "ADD":product.quantity = product.quantity+1;
-          break;
-          case  "REMOVE": product.quantity = product.quantity-1;
-          break;
-          case "MOVE": product.quantity = 0;
+        switch (action.toUpperCase()) {
+          case "ADD":
+            product.quantity = product.quantity + 1;
+            break;
+          case "REMOVE":
+            product.quantity = product.quantity - 1;
+            break;
+          case "MOVE":
+            product.quantity = 0;
         }
-        product.quantity > 0 ? (product.active = true) : (product.active = false);
+        product.quantity > 0
+          ? (product.active = true)
+          : (product.active = false);
         break;
       }
     }
   } else {
     resStatus = 201;
-    cart.products.push({ _id, quantity:1, active: true });
+    cart.products.push({ _id, quantity: 1, active: true });
   }
 
   let updatedCart = await cart.save();
@@ -93,9 +97,26 @@ const clearCart = async (req, res) => {
   res.json({ success: true, cart: emptyCart });
 };
 
+const removeFromCart = async (req, res) => {
+  let { cart } = req;
+  let { _id } = req.body;
+  for (let product of cart.products) {
+    if (product._id == _id) {
+      product.active = false;
+      product.quantity = 0;
+      break;
+    }
+  }
+
+  let updatedCart = await cart.save();
+  updatedCart = await getCartItems(updatedCart);
+  res.json({ success: true, cart: updatedCart });
+};
+
 module.exports = {
   findUserCart,
   getUserCart,
   updateCart,
-  clearCart
+  clearCart,
+  removeFromCart,
 };
