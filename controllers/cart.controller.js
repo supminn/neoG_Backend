@@ -126,10 +126,27 @@ const clearCart = async (req, res) => {
   res.json({ success: true, cart: emptyCart });
 };
 
+const removeFromCart = async (req, res) => {
+  let { cart } = req;
+  let { _id } = req.body;
+  for (let product of cart.products) {
+    if (product._id == _id) {
+      product.active = false;
+      product.quantity = 0;
+      break;
+    }
+  }
+
+  let updatedCart = await cart.save();
+  updatedCart = await getCartItems(updatedCart);
+  res.json({ success: true, cart: updatedCart });
+};
+
 module.exports = {
   findUserCart,
   getUserCart,
   updateCart,
   checkoutToPayment,
   clearCart,
+  removeFromCart,
 };
